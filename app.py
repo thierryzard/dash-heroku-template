@@ -1,37 +1,6 @@
-# Import required libraries
-import os
-from random import randint
-
-import plotly.plotly as py
-from plotly.graph_objs import *
-
-import flask
-import dash
-from dash.dependencies import Input, Output, State, Event
-import dash_core_components as dcc
-import dash_html_components as html
-
-
-
-
-
-
-
-
-# Setup the app
-# Make sure not to change this file name or the variable names below,
-# the template is configured to execute 'server' on 'app.py'
-server = flask.Flask(__name__)
-server.secret_key = os.environ.get('secret_key', str(randint(0, 1000000)))
-app = dash.Dash(__name__, server=server)
-
-
 #import modules
 import plotly.graph_objects as go
-import plotly.express as px
 import pandas as pd
-import io
-import requests
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -39,8 +8,7 @@ import dash_html_components as html
 
 #binnen halen URL data
 url_sex = 'https://raw.githubusercontent.com/J535D165/CoronaWatchNL/master/data/rivm_NL_covid19_sex.csv'
-source_sex = requests.get(url_sex).content
-df_sex = pd.read_csv(io.StringIO(source_sex.decode('utf-8')))
+df_sex = pd.read_csv(url_sex)
 
 
 #selecteerd laatste datum
@@ -128,10 +96,21 @@ fig.add_annotation(
 fig.update_yaxes(automargin=True)
 fig.update_xaxes(automargin=True)
 
+tabtitle= 'Corona'
+########### Initiate the app
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
+app.title=tabtitle
 
-fig.show()
+########### Set up the layout
+app.layout = html.Div(children=[
+    dcc.Graph(
+        id='Corona',
+        figure=fig
+    )
+]
+)
 
-
-# Run the Dash app
 if __name__ == '__main__':
-    app.server.run(debug=True, threaded=True)
+    app.run_server()
